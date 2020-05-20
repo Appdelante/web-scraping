@@ -1,0 +1,15 @@
+{
+  "name": "web-scraping",
+  "version": "1.0.0",
+  "description": "sección de web scraping del curso de puppeteer y automatización",
+  "main": "index.js",
+  "scripts": {},
+  "author": "Ricardo Macario",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "json2csv": "^5.0.1",
+    "mongoose": "^5.9.15",
+    "puppeteer": "^3.1.0"
+  }
+}
