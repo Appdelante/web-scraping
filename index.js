@@ -42,12 +42,28 @@ const puppeteer = require("puppeteer");
       return acc;
     }, {});
 
+    const servicios = [
+      ...document.querySelectorAll(".CasaVista__extra"),
+    ].map((nodo) => nodo.innerText.toLowerCase());
+    const numeroDeEstrellas = Number(
+      document.querySelector(".Opiniones__numero-de-estrellas").innerText
+    );
+    const numeroDeOpiniones = Number(
+      document
+        .querySelector(".Opiniones__numero-de-opiniones")
+        .innerText.replace(/[^0-9]/g, "")
+    );
+
     return {
       imagenes,
       titulo,
       ubicacion,
       precio,
       comodidades,
+      servicios,
+      numeroDeEstrellas,
+      numeroDeOpiniones,
+      url: window.location.href,
     };
   });
 
