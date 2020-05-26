@@ -27,11 +27,27 @@ const puppeteer = require("puppeteer");
     const titulo = document.querySelector(".CasaVista__titulo").innerText;
     const ubicacion = document.querySelector(".CasaVista__titulo + div")
       .innerText;
+    const precio = Number(
+      document
+        .querySelector(".CasaVista__precio")
+        .innerText.replace(/[^0-9]/g, "")
+    );
+
+    const comodidades = [
+      ...document.querySelectorAll(".CasaVista__cuartos span"),
+    ].reduce((acc, comodidad) => {
+      const [cantidad, nombre] = comodidad.innerText.split(" ");
+      acc[nombre] = Number(cantidad);
+
+      return acc;
+    }, {});
 
     return {
       imagenes,
       titulo,
       ubicacion,
+      precio,
+      comodidades,
     };
   });
 
