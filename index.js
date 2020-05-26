@@ -1,3 +1,5 @@
+const path = require("path");
+const fs = require("fs");
 const puppeteer = require("puppeteer");
 
 (async () => {
@@ -8,6 +10,7 @@ const puppeteer = require("puppeteer");
     // slowMo: 500,
   });
   const page = await browser.newPage();
+  const casas = [];
 
   await page.goto("https://nextviaje.now.sh/");
 
@@ -18,54 +21,63 @@ const puppeteer = require("puppeteer");
     )
   );
 
-  await page.goto(urls[0]);
-  const detallesDeLaCasa = await page.evaluate(() => {
-    const imagenes = [
-      ...document.querySelectorAll(".CasaVista__fotos img"),
-    ].map((img) => img.src);
+  for (const url of urls) {
+    await page.goto(url);
 
-    const titulo = document.querySelector(".CasaVista__titulo").innerText;
-    const ubicacion = document.querySelector(".CasaVista__titulo + div")
-      .innerText;
-    const precio = Number(
-      document
-        .querySelector(".CasaVista__precio")
-        .innerText.replace(/[^0-9]/g, "")
-    );
+    const detallesDeLaCasa = await page.evaluate(() => {
+      const imagenes = [
+        ...document.querySelectorAll(".CasaVista__fotos img"),
+      ].map((img) => img.src);
 
-    const comodidades = [
-      ...document.querySelectorAll(".CasaVista__cuartos span"),
-    ].reduce((acc, comodidad) => {
-      const [cantidad, nombre] = comodidad.innerText.split(" ");
-      acc[nombre] = Number(cantidad);
+      const titulo = document.querySelector(".CasaVista__titulo").innerText;
+      const ubicacion = document.querySelector(".CasaVista__titulo + div")
+        .innerText;
+      const precio = Number(
+        document
+          .querySelector(".CasaVista__precio")
+          .innerText.replace(/[^0-9]/g, "")
+      );
 
-      return acc;
-    }, {});
+      const comodidades = [
+        ...document.querySelectorAll(".CasaVista__cuartos span"),
+      ].reduce((acc, comodidad) => {
+        const [cantidad, nombre] = comodidad.innerText.split(" ");
+        acc[nombre] = Number(cantidad);
 
-    const servicios = [
-      ...document.querySelectorAll(".CasaVista__extra"),
-    ].map((nodo) => nodo.innerText.toLowerCase());
-    const numeroDeEstrellas = Number(
-      document.querySelector(".Opiniones__numero-de-estrellas").innerText
-    );
-    const numeroDeOpiniones = Number(
-      document
-        .querySelector(".Opiniones__numero-de-opiniones")
-        .innerText.replace(/[^0-9]/g, "")
-    );
+        return acc;
+      }, {});
 
-    return {
-      imagenes,
-      titulo,
-      ubicacion,
-      precio,
-      comodidades,
-      servicios,
-      numeroDeEstrellas,
-      numeroDeOpiniones,
-      url: window.location.href,
-    };
-  });
+      const servicios = [
+        ...document.querySelectorAll(".CasaVista__extra"),
+      ].map((nodo) => nodo.innerText.toLowerCase());
+      const numeroDeEstrellas = Number(
+        document.querySelector(".Opiniones__numero-de-estrellas").innerText
+      );
+      const numeroDeOpiniones = Number(
+        document
+          .querySelector(".Opiniones__numero-de-opiniones")
+          .innerText.replace(/[^0-9]/g, "")
+      );
 
-  console.log(detallesDeLaCasa);
+      return {
+        imagenes,
+        titulo,
+        ubicacion,
+        precio,
+        comodidades,
+        servicios,
+        numeroDeEstrellas,
+        numeroDeOpiniones,
+        url: window.location.href,
+      };
+    });
+
+    casas.push(detallesDeLaCasa);
+  }
+
+  const data = JSON.stringify(casas);
+  fs.writeFileSync(path.join(__dirname, "casas.json"), data);
+
+  await browser.close();
+  process.exit();
 })();
