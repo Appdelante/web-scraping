@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Casa = require("./casa");
 
 mongoose.connect("mongodb://127.0.0.1:27017/nextviaje", {
   useNewUrlParser: true,
@@ -8,19 +9,6 @@ mongoose.connection.on("error", function (error) {
   console.log("Error conectandome a MongoDB", error);
   process.exit(1);
 });
-
-const CasaEsquema = new mongoose.Schema({
-  imagenes: [{ type: String }],
-  titulo: String,
-  ubicacion: String,
-  precio: Number,
-  comodidades: { habitaciones: Number, camas: Number, baños: Number },
-  servicios: [{ type: String }],
-  numeroDeEstrellas: Number,
-  numeroDeOpiniones: Number,
-  url: String,
-});
-const Casa = mongoose.model("Casa", CasaEsquema);
 
 exports.guardarCasas = async (casas) => {
   for (const casa of casas) {
